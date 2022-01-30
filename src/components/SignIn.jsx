@@ -1,64 +1,51 @@
-import React, { useRef } from 'react'
-import {useState} from 'react';
+import { useState } from 'react'
 import FeedbackModal from "./Modal"
 import Footer from './Footer';
 import { Link } from "react-router-dom";
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-// import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-// import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import {
+  ValidatorForm,
+  TextValidator
+}
+  from 'react-material-ui-form-validator';
 
-const theme = createTheme();
 
-export default function SignInSide() {
-  const initVal={
-    email:"",
-    password:""
+export default function SignIn() {
+  const [credential, setCredential] = useState({ email: "", password: "" })
+  const [displayModal , setDisplay] = useState(false)
+  const [feed , setFeed]=useState("");
+
+  const handleChange = (e) => {
+    const { name, value } = e.currentTarget;
+    setCredential({ ...credential, [name]: value })
   }
-  
-const [val , setVal]=useState(initVal);
-const [isLoggedIn , setLogin]=useState(false);
-const [msz , setMsz] = useState("");
-const formEle=useRef();
-  let Feedback="";
 
-  const handleChange=(e)=>{
+  const handleClick=()=>{
+    setDisplay(false)
+  }
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const {name , value} = e.target;
-    setVal({...val, [name] : value});
-  }
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    fetch(`https://61e15f2b63f8fc0017618b84.mockapi.io/users`)
-    .then(data=>data.json())
-    .then(data=>{
-        const user=data.find(({email , password}) => email == val.email && password == val.password);
-        setLogin(true);
-        if(user){
-          setMsz("You've logged in successfully")
-        }else{
-          setMsz("Your username or password is incorrect!")
-        }
-        // formEle.current.reset();
-        setVal(initVal)
+    fetch("https://61f6747a2e1d7e0017fd6db9.mockapi.io/users")
+      .then(res => res.json())
+      .then(data => {
+          const user=data.find(({email,password})=>{
+            return  email == credential.email && password === credential.password
+          })
+          user ? setFeed("Logged in Successfully"):setFeed("Try Again Later")
+          setDisplay(true);
       })
-    }
-
-    const handleClick=()=>setLogin(false);
+  }
 
   return (
-    <ThemeProvider theme={theme}>
+    <>
       <Grid container component="main" sx={{ height: '100vh' }}>
-        <CssBaseline />
         <Grid
           item
           xs={false}
@@ -67,8 +54,6 @@ const formEle=useRef();
           sx={{
             backgroundImage: 'url(https://source.unsplash.com/random)',
             backgroundRepeat: 'no-repeat',
-            backgroundColor: (t) =>
-              t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
@@ -89,26 +74,34 @@ const formEle=useRef();
             <Typography component="h1" variant="h5">
               Sign in
             </Typography>
-            <Box component="form" ref={formEle} noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
-              <TextField
+            <ValidatorForm  noValidate  onSubmit={handleSubmit} style={{width:"100%"}} >
+              <TextValidator
                 margin="normal"
+                autoComplete="off"
                 required
                 fullWidth
                 label="Email Address"
                 name="email"
-                value={val.email}
+                type="email"
+                value={credential.email}
                 onChange={handleChange}
+                validators={['required']}
+                errorMessages={['this field is required']}
               />
-              <TextField
+              <TextValidator
                 margin="normal"
+                autoComplete="off"
                 required
                 fullWidth
                 label="Password"
                 name="password"
-                value={val.password}
+                type="password"
+                value={credential.password}
                 onChange={handleChange}
+                validators={['required']}
+                errorMessages={['this field is required']}
               />
-              
+
               {/* <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
                 label="Remember me"
@@ -134,11 +127,11 @@ const formEle=useRef();
                 </Grid>
               </Grid>
               <Footer sx={{ mt: 5 }} />
-            </Box>
+            </ValidatorForm>
           </Box>
         </Grid>
       </Grid>
-      {isLoggedIn ? <FeedbackModal children={msz} handleClick={handleClick} /> : ""}
-    </ThemeProvider>
+      { displayModal ?  <FeedbackModal children={feed} handleClick={handleClick} /> : "" }
+    </>
   );
 }

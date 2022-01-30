@@ -1,5 +1,4 @@
-import  React from 'react';
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -12,22 +11,13 @@ export default function ButtonAppBar() {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar >
-        <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-          >
-            {/* <MenuIcon /> */}
-          </IconButton>
-          <Link to="/">
-           Sures Man
-          </Link>
-          <Link to="/test">Test</Link>
-          <Link to="/signin">Sign In</Link>
-          <Link to="/signup">Sign Up</Link>
+        <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Link to="/">Home</Link>
+          <div>
+            <Link to="/login"> Login</Link>
+            <Link to="/register"> Register</Link>
+
+          </div>
         </Toolbar>
       </AppBar>
     </Box>
